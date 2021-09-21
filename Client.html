@@ -39,8 +39,6 @@
         
         .form {
             width: 80%;
-            position: absolute;
-            bottom: 10px;
             display: flex;
             align-items: center;
         }
@@ -87,51 +85,39 @@
 <body>
     <div class="content">
         <div id="history"></div>
-        <div class="form">
-            <input type="text" value="" autocomplete="off" id="input">
-            <button onclick="Send()">发送</button>
-        </div>
-        <div id="users">
-            <div id="username" onclick="Getuser(users[0])">账号：灵魂之韵</div>
-            <div id="username" onclick="Getuser(users[1])">账号：艾斯克龙</div>
-            <div id="CurrentUser"></div>
-        </div>
+        <input type="text" value="" placeholder="输入房间号" id="input1">
+        <button onclick="Join()">加入</button>
+        <input type="text" value="" placeholder="输入内容" id="input">
+        <button onclick="Send()">发送</button>
 
     </div>
 
 </body>
 <script>
     var socket = io();
-    let CurrentUser = new Object()
-    var users = [{
-        id: '001',
-        username: '灵魂之韵',
-        content: ''
-    }, {
-        id: '002',
-        username: '艾斯克龙',
-        content: ''
-    }]
-    socket.on('chat message', (msg) => {
+    socket.on('chat', (msg) => {
         console.log(msg)
-        let item = msg
-        $('#history').append($('<li>').text(item.username + '：' + item.content))
     })
 
-    socket.on('hi', (msg) => {
-        console.log(msg, '新接手的')
+    socket.on('room', (msg) => {
+        console.log(msg)
     })
+
 
     function Send() {
+        let room = $('#input1').val()
         let content = $('#input').val()
-        CurrentUser.content = content
-        socket.emit('chat message', CurrentUser)
-        console.log(CurrentUser)
+        socket.emit('chat message', {
+            content: content
+        })
     }
 
-    function Getuser(e) {
-        CurrentUser = e
-        $('#CurrentUser').html($('<div>').text('当前账号：' + CurrentUser.username))
+    function Join() {
+        let room = $('#input1').val()
+
+        socket.emit('join', {
+            room: room
+        })
     }
 </script>
 
